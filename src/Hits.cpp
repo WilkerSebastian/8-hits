@@ -1,4 +1,5 @@
 #include "../include/Hits.hpp"
+#include<iostream>
 #ifdef _WIN32 // Verifica se o sistema operacional é Windows
     #include <windows.h>
     void beep(int freq, int dur) {

@@ -1,5 +1,8 @@
 #include "../include/Note.hpp"
-#include <map>
+#include <iostream>
+#include <cmath>
+#include <regex>
+#include <unordered_map>
 
 Note::Note(std::string note) {
 
@@ -19,34 +22,47 @@ Note::Note(std::string note, uint16_t time) {
 
 void Note::setNote(std::string note) {
 
-    const std::map<std::string, int> notes = {
-        {"C", 132},
-        {"C#", 137},
-        {"Db", 142},
-        {"D", 148},
-        {"D#", 154},
-        {"Eb", 158},
-        {"E", 165},
-        {"Fb", 168},
-        {"E#", 171},
-        {"F", 175},
-        {"F#", 183},
-        {"Gb", 190},
-        {"G", 198},
-        {"G#", 206},
-        {"Ab", 211},
-        {"A", 220},
-        {"A#", 229},
-        {"Bb", 237},
-        {"B", 247},
-        {"Cb", 253},
-        {"B#", 257},
-        {"D1#", 264},
+    // Mapa com as notas e seus respectivos valores de n
+    std::unordered_map<std::string, int> noteValues = {
+        {"C", -9},
+        {"C#", -8},
+        {"Db", -8},
+        {"D", -7},
+        {"D#", -6},
+        {"Eb", -6},
+        {"E", -5},
+        {"F", -4},
+        {"F#", -3},
+        {"Gb", -3},
+        {"G", -2},
+        {"G#", -1},
+        {"Ab", -1},
+        {"A", 0},
+        {"A#", 1},
+        {"Bb", 1},
+        {"B", 2}
     };
 
-    auto it = notes.find(note);
+    // Obtém a nota e a oitava a partir da string
+    std::regex pattern("([A-Ga-g])(#|b)?(\\d+)?"); // expressão regular para separar nota, acidente e oitava
+    std::smatch match;
 
-    this->frequency = it != notes.end() ? it->second : 0;
+    if(std::regex_match(note, match, pattern)) {
+        
+        std::string noteName = match[1].str();
+        int octave = match[3].str().empty() ? 4 : stoi(match[3].str());
+
+        // Obtém o valor de n a partir da nota e da oitava
+        int noteValue = 12 * (octave - 4) + noteValues[noteName];
+
+        // Calcula e retorna a frequência correspondente
+        double frequency =  pow(2, noteValue / 12.0) * 440;
+
+        this->frequency = static_cast<uint16_t>(frequency);
+
+    } else {
+        this->frequency = 0;
+    }
 
 }
 
